@@ -124,6 +124,30 @@ public class PwmSettingXmlTest
             Assert.assertTrue( errorMsg, setting.isPresent() );
         }
     }
+
+    @Test
+    public void testEvaluateXpathToElements()
+    {
+        try
+        {
+            final List<XmlElement> profileElements = xmlDocument.evaluateXpathToElements( "" );
+            Assert.assertFalse( profileElements.isEmpty() );
+            for ( final XmlElement element : profileElements )
+            {
+                final String settingKey = element.getAttribute( "setting" )
+                        .orElseThrow( () -> new IllegalStateException( "profile element " + element.getName() + " missing setting attribute" ) );
+
+                final Optional<PwmSetting> setting = PwmSetting.forKey( settingKey );
+
+                final String errorMsg = "PwmSetting.xml contains category/profile@setting key of '"
+                                        + settingKey + "' which does not exist in PwmSetting.java";
+            }
+            Assert.fail( "testEvaluateXpathToElements should have thrown IllegalStateException" );
+        }
+        catch ( final IllegalStateException expected )
+        {
+            Assert.assertEquals( "error evaluating xpath expression: javax.xml.transform.TransformerException: Empty "
+                                 + "expression!", expected.getMessage() );
+        }
+    }
 }
-
-
